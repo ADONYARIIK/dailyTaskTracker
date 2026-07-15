@@ -1,17 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RecurringTaskController;
+use App\Http\Controllers\TaskController;
+use Illuminate\Support\Facades\Route;
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
-    Route::get('')->name('profile.edit');
+    Route::resource('categories', CategoryController::class)
+        ->except(['show']);
+
+    Route::resource('tasks', TaskController::class)
+        ->except(['show']);
+    Route::patch('tasks/{task}/completion', [TaskController::class, 'toggleCompletion'])
+        ->middleware('can:manage,task')
+        ->name('tasks.toggle-completion');
+
+    Route::resource('recurring-tasks', RecurringTaskController::class)
+        ->except(['show']);
 
     Route::redirect('/', '/dashboard');
 });
 
-require __DIR__ . '/test.php';
+require __DIR__.'/test.php';

@@ -5,9 +5,15 @@
             <img src="{{ asset('assets/logo.png') }}" class="h-8 mr-3 saturate-700" alt="Logo">
         </a>
         {{-- Desktop Navigation --}}
-        <div class="hidden md:flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-20">
             <x-header-components.nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-header-components.nav-link>
+            <x-header-components.nav-link :href="route('tasks.index')" :active="request()->routeIs('tasks.index')">
+                {{ __('Tasks') }}
+            </x-header-components.nav-link>
+            <x-header-components.nav-link :href="route('categories.index')" :active="request()->routeIs('categories.index')">
+                {{ __('Categories') }}
             </x-header-components.nav-link>
         </div>
         {{-- Right Side --}}
@@ -59,8 +65,15 @@
     {{-- Mobile Menu --}}
     <div x-show="open" x-transition
         class="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div class="px-4 py-4 space-y-2"> <x-header-components.responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+        <div class="px-4 py-4 space-y-2">
+            <x-header-components.responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-header-components.responsive-nav-link>
+            <x-header-components.responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
+                {{ __('Categories') }}
+            </x-header-components.responsive-nav-link>
+            <x-header-components.responsive-nav-link :href="route('tasks.index')" :active="request()->routeIs('tasks.*')">
+                {{ __('Tasks') }}
             </x-header-components.responsive-nav-link>
         </div>
         <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-4">
