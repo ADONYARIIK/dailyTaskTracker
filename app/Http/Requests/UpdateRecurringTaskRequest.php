@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests;
 
 use App\Enums\TaskFrequency;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateRecurringTaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::user()->can('manage', $this->route('recurring_task'));
+        return $this->user()->can('manage', $this->route('recurring_task'));
     }
 
     /**

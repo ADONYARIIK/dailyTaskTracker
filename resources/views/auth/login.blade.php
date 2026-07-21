@@ -10,7 +10,8 @@
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('login.post') }}">
+                <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('login.post') }}"
+                    x-data="{ submitting: false }" @submit="submitting = true">
                     @csrf
                     {{-- Email --}}
                     <div>
@@ -46,8 +47,9 @@
                             </a>
                         @endif
                     </div>
-                    <x-input.primary-button>
-                        {{ __('Log in') }}
+                    <x-input.primary-button ::disabled="submitting">
+                        <span x-show="!submitting">{{ __('Log in') }}</span>
+                        <span x-show="submitting" x-cloak>{{ __('Processing...') }}</span>
                     </x-input.primary-button>
                     <x-input.error :messages="$errors->get('attempt')" class="mt-2" />
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400">

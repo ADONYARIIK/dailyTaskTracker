@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Enums\TaskFrequency;
@@ -38,7 +40,7 @@ class GenerateRecurringTasks extends Command
             return self::FAILURE;
         }
 
-        $this->info('Processing '.$totalRecurringTasks->count().' recurring task templates...');
+        $this->info('Processing ' . $totalRecurringTasks->count() . ' recurring task templates...');
 
         $created = 0;
         $skipped = 0;
@@ -57,7 +59,7 @@ class GenerateRecurringTasks extends Command
                                 continue;
                             }
 
-                            $now = new DateTime;
+                            $now = new DateTime();
 
                             $insertTasksBatch[] = [
                                 'uuid' => (string) Str::uuid7(),
@@ -85,13 +87,13 @@ class GenerateRecurringTasks extends Command
                 } catch (\Exception $e) {
                     report($e);
                 }
-            }
+            },
         );
 
-        $this->info('Created '.$created.' recurring tasks.');
+        $this->info('Created ' . $created . ' recurring tasks.');
 
         if ($skipped > 0) {
-            $this->warn('Skipped '.$skipped.' recurring tasks.');
+            $this->warn('Skipped ' . $skipped . ' recurring tasks.');
         }
 
         $this->newLine();

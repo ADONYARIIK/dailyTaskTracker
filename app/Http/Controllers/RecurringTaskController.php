@@ -1,120 +1,88 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Actions\Category\GetCategories;
+use App\Actions\RecurringTask\CreateRecurringTask;
+use App\Actions\RecurringTask\DeleteRecurringTask;
+use App\Actions\RecurringTask\ListRecurringTasks;
+use App\Actions\RecurringTask\UpdateRecurringTask;
 use App\Enums\TaskFrequency;
 use App\Http\Requests\StoreRecurringTaskRequest;
 use App\Http\Requests\UpdateRecurringTaskRequest;
-use App\Models\Category;
 use App\Models\RecurringTask;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class RecurringTaskController extends Controller
 {
-    public function index(Request $request): View
-    {
-        $recurringTasks = $request->user()
-            ->recurringTasks()
-            ->with('category')
-            ->latest()
-            ->paginate();
+    public function __construct(private GetCategories $getCategories) {}
 
-        return view('recurring-tasks.index', [
-            'recurringTasks' => $recurringTasks->toResourceCollection()->resolve(),
-            'links' => fn() => $recurringTasks->links(),
-        ]);
+    public function index(Request $request, ListRecurringTasks $listRecurringTasks): View
+    {
+        $recurringTasks = $listRecurringTasks->execute($request->user());
+
+        return view(
+            'recurring-tasks.index',
+            [
+                'recurringTasks' => $recurringTasks->toResourceCollection()->resolve(),
+                'links' => fn () => $recurringTasks->links(),
+                'categories' => $this->getCategories->execute($request->user()->id),
+            ],
+        );
     }
 
     public function create(Request $request): View
     {
-        $categories = $request->user()->categories()->orderBy('name')->pluck('name', 'uuid')->toArray();
-
-        return view('recurring-tasks.create', ['categories' => $categories]);
+        return view(
+            'recurring-tasks.create',
+            [
+                'categories' => $this->getCategories->execute($request->user()->id),
+                'frequency' => TaskFrequency::cases(),
+            ],
+        );
     }
 
-    public function store(StoreRecurringTaskRequest $request): RedirectResponse
+    public function store(StoreRecurringTaskRequest $request, CreateRecurringTask $createRecurringTask): RedirectResponse
     {
-        $data = $request->validated();
+        $createRecurringTask->execute($request->user(), $request->validated());
 
-        if ($request->category_id) {
-            $category = Category::where('uuid', $request->category_id)->first();
-
-            if (!$category || $request->user()->cannot('manage', $category)) {
-                throw ValidationException::withMessages(['category_id' => 'The given category id does not exists.']);
-            }
-
-            $data['category_id'] = $category->id;
-        }
-
-        $data['frequency_config'] = $this->buildFrequencyConfig($data);
-
-        unset($data['days'], $data['day_of_month']);
-
-        $request->user()->recurringTasks()->create($data);
-
-        return redirect()->route('recurring-tasks.index')->with('success', 'Recurring task created successfully');
+        return redirect()
+            ->route('recurring-tasks.index')
+            ->with('success', 'Recurring task created successfully');
     }
 
     public function edit(Request $request, RecurringTask $recurringTask): View
     {
         $recurringTask->load('category');
 
-        $categories = $request->user()->categories()->orderBy('name')->pluck('name', 'uuid')->toArray();
-
-        return view('recurring-tasks.edit', [
-            'recurringTask' => $recurringTask->toResource()->resolve(),
-            'categories' => $categories,
-        ]);
+        return view(
+            'recurring-tasks.edit',
+            [
+                'recurringTask' => $recurringTask->toResource()->resolve(),
+                'categories' => $this->getCategories->execute($request->user()->id),
+                'frequency' => TaskFrequency::cases(),
+            ],
+        );
     }
 
-    public function update(UpdateRecurringTaskRequest $request, RecurringTask $recurringTask): RedirectResponse
+    public function update(UpdateRecurringTaskRequest $request, RecurringTask $recurringTask, UpdateRecurringTask $updateRecurringTask): RedirectResponse
     {
-        $data = $request->validated();
+        $updateRecurringTask->execute($request->user(), $recurringTask, $request->validated());
 
-        if ($request->category_id) {
-            $category = Category::where('uuid', $request->category_id)->first();
-
-            if (!$category || $request->user()->cannot('manage', $category)) {
-                throw ValidationException::withMessages(['category_id' => 'The given category id does not exists.']);
-            }
-
-            $recurringTask->category()->associate($category);
-
-            unset($data['category_id']);
-        }
-
-        $data['frequency_config'] = $this->buildFrequencyConfig($data);
-
-        unset($data['days'], $data['day_of_month']);
-
-        $recurringTask->fill($data);
-        $recurringTask->save();
-
-        return redirect()->route('recurring-tasks.index')->with('success', 'Recurring task created successfully');
+        return redirect()
+            ->route('recurring-tasks.index')
+            ->with('success', 'Recurring task created successfully');
     }
 
-    public function destroy(RecurringTask $recurringTask): RedirectResponse
+    public function destroy(RecurringTask $recurringTask, DeleteRecurringTask $deleteRecurringTask): Response
     {
-        $recurringTask->delete();
+        $deleteRecurringTask->execute($recurringTask);
 
-        return redirect()->route('recurring-tasks.index')->with('success', 'Recurring task deleted successfully');
-    }
-
-    private function buildFrequencyConfig(array $data): ?array
-    {
-        $frequency = $data['frequency'];
-
-        if ($frequency === TaskFrequency::Weekly->value && isset($data['days'])) {
-            return ['days' => $data['days']];
-        }
-
-        if ($frequency === TaskFrequency::Monthly->value && isset($data['day_of_month'])) {
-            return ['day_of_month' => (int) $data['day_of_month']];
-        }
-
-        return null;
+        return response()->noContent();
     }
 }

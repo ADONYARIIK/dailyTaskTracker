@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TaskSeeder extends Seeder
@@ -25,20 +26,20 @@ class TaskSeeder extends Seeder
                 ->for($categories->random())
                 ->create();
 
-                Task::factory()
+            Task::factory()
                 ->count(rand(5, 10))
                 ->for($user)
                 ->withoutCategories()
                 ->create();
 
-                Task::factory()
+            Task::factory()
                 ->count(rand(10, 20))
                 ->for($user)
                 ->for($categories->random())
                 ->completed()
                 ->create();
 
-                Task::factory()
+            Task::factory()
                 ->count(rand(5, 10))
                 ->for($user)
                 ->for($categories->random())

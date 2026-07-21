@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use App\Enums\TaskFrequency;
@@ -30,10 +32,10 @@ class RecurringTaskResource extends JsonResource
             'frequency_config' => $this->frequency_config,
             'days' => $this->frequency_config['days'] ?? [],
             'day_of_month' => $this->frequency_config['day_of_month'] ?? null,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'start_date' => (new DateTimeResource($this->start_date, false))->resolve($request),
+            'end_date' => (new DateTimeResource($this->end_date, false))->resolve($request),
+            'created_at' => (new DateTimeResource($this->created_at))->resolve($request),
+            'updated_at' => (new DateTimeResource($this->updated_at))->resolve($request),
         ];
     }
 

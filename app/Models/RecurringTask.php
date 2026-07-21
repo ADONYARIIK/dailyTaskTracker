@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\TaskFrequency;
@@ -29,10 +31,11 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read \App\Models\Category|null $category
- * @property-read Collection<int, \App\Models\Task> $tasks
+ * @property-read Category|null $category
+ * @property-read Collection<int, Task> $tasks
  * @property-read int|null $tasks_count
- * @property-read \App\Models\User $user
+ * @property-read User $user
+ *
  * @method static \Database\Factories\RecurringTaskFactory factory($count = null, $state = [])
  * @method static Builder<static>|RecurringTask newModelQuery()
  * @method static Builder<static>|RecurringTask newQuery()
@@ -53,13 +56,14 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|RecurringTask whereUuid($value)
  * @method static Builder<static>|RecurringTask withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|RecurringTask withoutTrashed()
+ *
  * @mixin \Eloquent
  */
-#[Fillable(['user_id', 'category_id', 'title', 'description', 'frequency', 'frequency_config', 'start_date', 'end_date'])]
+#[Fillable(['category_id', 'title', 'description', 'frequency', 'frequency_config', 'start_date', 'end_date'])]
 #[Hidden(['id'])]
 class RecurringTask extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected function casts(): array
     {

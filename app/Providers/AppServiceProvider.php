@@ -1,12 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
+use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\LazyLoadingViolationException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Password::defaults(function () {
-            if ($this->app->isLocal()) {
+            if (app()->isLocal()) {
                 return Password::min(8);
             }
 
@@ -40,9 +47,9 @@ class AppServiceProvider extends ServiceProvider
             if ($request->expectsJson()) {
                 return response()->json(
                     [
-                        'attempt' => 'Too many login attempts. Please try again in 1 minute.'
+                        'attempt' => 'Too many login attempts. Please try again in 1 minute.',
                     ],
-                    429
+                    429,
                 );
             }
 
@@ -71,5 +78,21 @@ class AppServiceProvider extends ServiceProvider
                 Limit::perHour(3)->by($request->input('email')),
             ];
         });
+
+        DB::prohibitDestructiveCommands(app()->isProduction());
+
+        Model::shouldBeStrict();
+
+        Model::handleLazyLoadingViolationUsing(function ($model, $relation) {
+            if (app()->isLocal()) {
+                throw new LazyLoadingViolationException($model, $relation);
+            }
+
+            $class = \get_class($model);
+
+            info('Attempted tp lazy load "' . $relation . '" on model "' . '"');
+        });
+
+        Date::use(CarbonImmutable::class);
     }
 }

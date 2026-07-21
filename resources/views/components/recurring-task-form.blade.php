@@ -4,6 +4,7 @@
     'action',
     'method' => 'POST',
     'submitLabel' => null,
+    'afterSubmitLabel' => null,
 ])
 
 @php
@@ -21,12 +22,8 @@
     $selectedFrequency = old('frequency', $recurringTask['frequency'] ?? 'daily');
 @endphp
 
-{{-- @if ($errors->any())
-    <pre>{{ dd($errors->all()) }}</pre>
-@endif --}}
-
 <form method="POST" action="{{ $action }}" x-data="{ frequency: @js($selectedFrequency) }"
-    {{ $attributes->merge(['class' => 'space-y-4 md:space-y-6']) }}>
+    {{ $attributes->merge(['class' => 'space-y-4 md:space-y-6']) }} x-data="{ submitting: false }" @submit="submitting = true">
     @csrf
     @if ($method !== 'POST')
         @method($method)
@@ -99,13 +96,13 @@
     <div class="grid gap-4 sm:grid-cols-2">
         <div>
             <x-input.label for="start_date" :value="__('Start date')" />
-            <x-input.text-input id="start_date" type="date" name="start_date" :value="old('start_date', ($recurringTask['start_date'] ?? null)?->toDateString())" />
+            <x-input.text-input id="start_date" type="date" name="start_date" :value="old('start_date', $recurringTask['start_date']['datetime'] ?? null)" />
             <x-input.error :messages="$errors->get('start_date')" class="mt-2" />
         </div>
 
         <div>
             <x-input.label for="end_date" :value="__('End date')" />
-            <x-input.text-input id="end_date" type="date" name="end_date" :value="old('end_date', ($recurringTask['end_date'] ?? null)?->toDateString())" />
+            <x-input.text-input id="end_date" type="date" name="end_date" :value="old('end_date', $recurringTask['end_date']['datetime'] ?? null)" />
             <x-input.error :messages="$errors->get('end_date')" class="mt-2" />
         </div>
     </div>
@@ -116,8 +113,13 @@
             {{ __('Cancel') }}
         </a>
 
-        <x-input.primary-button :fullWidth="false">
-            {{ $submitLabel ?? ($recurringTask ? __('Update') : __('Create')) }}
+        <x-input.primary-button :fullWidth="false" ::disabled="submitting">
+            <span x-show="!submitting">
+                {{ $submitLabel ?? ($recurringTask ? __('Update') : __('Create')) }}
+            </span>
+            <span x-show="submitting" x-cloak>
+                {{ $afterSubmitLabel ?? ($recurringTask ? __('Updating...') : __('Creating...')) }}
+            </span>
         </x-input.primary-button>
     </div>
 </form>

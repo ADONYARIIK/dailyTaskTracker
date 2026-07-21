@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-use App\Models\Category;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,7 +22,7 @@ class DatabaseSeeder extends Seeder
                 CategorySeeder::class,
                 TaskSeeder::class,
                 RecurringTaskSeeder::class,
-            ]
+            ],
         );
     }
 }

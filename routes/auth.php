@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\PasswordResetController;
-use Illuminate\Support\Facades\Route;
+declare(strict_types=1);
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\PasswordResetController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::controller(AuthController::class)->group(function () {

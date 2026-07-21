@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Enums\TaskFrequency;
 use App\Models\RecurringTask;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RecurringTaskSeeder extends Seeder
@@ -29,7 +30,7 @@ class RecurringTaskSeeder extends Seeder
                     TaskFrequency::Daily => $recurringTask->daily(),
                     TaskFrequency::Weekdays => $recurringTask->weekdays(),
                     TaskFrequency::Weekly => $recurringTask->weekly(),
-                    TaskFrequency::Monthly => $recurringTask->monthly()
+                    TaskFrequency::Monthly => $recurringTask->monthly(),
                 };
 
                 $recurringTask->create();

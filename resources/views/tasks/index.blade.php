@@ -26,18 +26,40 @@
                 <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
                     <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
+                            <th scope="col" class="px-6 py-3">{{ __('Status') }}</th>
                             <th scope="col" class="px-6 py-3">{{ __('Task') }}</th>
                             <th scope="col" class="px-6 py-3">{{ __('Category') }}</th>
                             <th scope="col" class="px-6 py-3">{{ __('Due date') }}</th>
-                            <th scope="col" class="px-6 py-3">{{ __('Status') }}</th>
                             <th scope="col" class="px-6 py-3"><span class="sr-only">{{ __('Actions') }}</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($tasks as $task)
-                            <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                            <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 group"
+                                data-task-item data-completed="{{ $task['completed_at'] ? 'true' : 'false' }}">
                                 <td class="px-6 py-4">
-                                    <p class="font-medium text-gray-900 dark:text-white">{{ $task['title'] }}</p>
+                                    <button type="button" data-task-toggle data-task-id="{{ $task['id'] }}"
+                                        aria-label="{{ $task['completed_at'] ? __('Mark incomplete') : __('Complete') }}"
+                                        aria-pressed="{{ $task['completed_at'] ? 'true' : 'false' }}"
+                                        class="inline-flex size-9 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-primary-600 focus:outline-none focus:ring-4 focus:ring-primary-300 disabled:opacity-50 dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-primary-400 dark:focus:ring-primary-800">
+                                        <svg class="group-data-[completed=false]:block hidden size-6 text-primary-500 dark:text-primary-400"
+                                            fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm0-2a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        <svg class="group-data-[completed=true]:block hidden size-6 text-primary-600 dark:text-primary-400"
+                                            fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.707-9.293a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4Z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p
+                                        class="group-data-[completed=true]:line-through font-medium text-gray-900 dark:text-white">
+                                        {{ $task['title'] }}</p>
                                     @if ($task['description'])
                                         <p class="mt-1 max-w-md text-sm">{{ Str::limit($task['description'], 50) }}</p>
                                     @endif
@@ -47,30 +69,17 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">{{ $task['category']['name'] ?? __('Uncategorized') }}</td>
-                                <td class="px-6 py-4">{{ $task['task_date']?->format('M d, Y g:i A') ?? '—' }}</td>
-                                <td class="px-6 py-4"><x-task-status :task="$task" /></td>
+                                <td class="px-6 py-4">{{ $task['task_date']['display'] ?? '—' }}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex flex-wrap items-center gap-3">
-                                        <form method="POST"
-                                            action="{{ route('tasks.toggle-completion', $task['id']) }}">
-                                            @csrf
-                                            @method('PATCH')
-                                            <x-input.secondary-button type="submit">
-                                                {{ $task['completed_at'] ? __('Mark incomplete') : __('Complete') }}
-                                            </x-input.secondary-button>
-                                        </form>
                                         <a href="{{ route('tasks.edit', ['task' => $task['id']]) }}"
                                             class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">
                                             {{ __('Edit') }}
                                         </a>
-                                        <form method="POST" action="{{ route('tasks.destroy', $task['id']) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="text-sm font-medium text-red-600 hover:underline dark:text-red-400">
-                                                {{ __('Delete') }}
-                                            </button>
-                                        </form>
+                                        <button type="button" data-task-delete data-id="{{ $task['id'] }}"
+                                            class="cursor-pointer text-sm font-medium text-red-600 hover:underline dark:text-red-400">
+                                            {{ __('Delete') }}
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -89,4 +98,7 @@
             </div>
         </x-card>
     </x-page-section>
+    @push('scripts')
+        @vite('resources/js/pages/tasks-index.js')
+    @endpush
 </x-layouts.app>

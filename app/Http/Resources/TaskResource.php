@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use App\Models\Task;
@@ -27,10 +29,10 @@ class TaskResource extends JsonResource
                 'name' => $this->category->name,
             ]),
             'recurring_task_id' => $this->recurring_task_id,
-            'task_date' => $this->task_date,
-            'completed_at' => $this->completed_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'task_date' => (new DateTimeResource($this->task_date, false))->resolve($request),
+            'completed_at' => (new DateTimeResource($this->completed_at))->resolve($request),
+            'created_at' => (new DateTimeResource($this->created_at))->resolve($request),
+            'updated_at' => (new DateTimeResource($this->updated_at))->resolve($request),
         ];
     }
 }

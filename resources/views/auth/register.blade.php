@@ -11,7 +11,8 @@
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('register.post') }}">
+                <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('register.post') }}"
+                    x-data="{ submitting: false }" @submit="submitting = true">
                     @csrf
                     {{-- Name --}}
                     <div>
@@ -54,8 +55,9 @@
                         </div>
                     </div>
 
-                    <x-input.primary-button>
-                        {{ __('Register') }}
+                    <x-input.primary-button ::disabled="submitting">
+                        <span x-show="!submitting">{{ __('Register') }}</span>
+                        <span x-show="submitting" x-cloak>{{ __('Processing...') }}</span>
                     </x-input.primary-button>
 
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400">

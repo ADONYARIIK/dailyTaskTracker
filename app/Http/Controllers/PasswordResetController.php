@@ -1,25 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\ResetPassword;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendPasswordResetEmailRequest;
 use App\Models\User;
-use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use SensitiveParameter;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class PasswordResetController extends Controller
 {
-    public function showPasswordResetRequestForm()
+    public function showPasswordResetRequestForm(): View
     {
         return view('auth.forgot-password');
     }
 
-    public function sendPasswordResetEmail(SendPasswordResetEmailRequest $request)
+    public function sendPasswordResetEmail(SendPasswordResetEmailRequest $request): RedirectResponse
     {
         $email = $request->string('email');
 
@@ -28,7 +30,7 @@ class PasswordResetController extends Controller
         return back()->with('status', 'If an account with this email exists, we will send a password reset link.');
     }
 
-    public function showPasswordResetForm(#[SensitiveParameter] string $token, Request $request)
+    public function showPasswordResetForm(#[SensitiveParameter] string $token, Request $request): View
     {
         return view('auth.reset-password', [
             'token' => $token,
@@ -36,17 +38,12 @@ class PasswordResetController extends Controller
         ]);
     }
 
-    public function resetPassword(ResetPasswordRequest $request)
+    public function resetPassword(ResetPasswordRequest $request, ResetPassword $resetPassword): RedirectResponse
     {
         $requestData = $request->validated();
 
-        $status = Password::reset($requestData, function (User $user, #[SensitiveParameter] string $newPassword) {
-            $user->password = Hash::make($newPassword);
-            $user->remember_token = Str::random(60);
-            $user->save();
-
-            event(new PasswordReset($user));
-        });
+        $status = Password::reset($requestData, fn (User $user, #[SensitiveParameter] string $newPassword) => $resetPassword
+            ->execute($user, $newPassword));
 
         if ($status === Password::PASSWORD_RESET) {
             return redirect()->route('login')->with('status', __($status));

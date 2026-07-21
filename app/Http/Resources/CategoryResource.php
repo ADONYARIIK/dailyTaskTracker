@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use App\Models\Category;
@@ -21,8 +23,8 @@ class CategoryResource extends JsonResource
         return [
             'id' => $this->uuid,
             'name' => $this->name,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => (new DateTimeResource($this->created_at))->resolve($request),
+            'updated_at' => (new DateTimeResource($this->updated_at))->resolve($request),
         ];
     }
 }

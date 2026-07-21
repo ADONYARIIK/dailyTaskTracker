@@ -10,7 +10,8 @@
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('password.email') }}">
+                <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('password.email') }}"
+                    x-data="{ submitting: false }" @submit="submitting = true">
                     @csrf
 
                     {{-- Email --}}
@@ -21,8 +22,9 @@
                         <x-input.error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
-                    <x-input.primary-button>
-                        {{ __('Email Password Reset Link') }}
+                    <x-input.primary-button ::disabled="submitting">
+                        <span x-show="!submitting">{{ __('Email Password Reset Link') }}</span>
+                        <span x-show="submitting" x-cloak>{{ __('Processing...') }}</span>
                     </x-input.primary-button>
 
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400">

@@ -8,7 +8,7 @@
 
             <x-flash-message />
 
-            <x-category-form :action="route('categories.store')" :submitLabel="__('Create')" />
+            <x-category-form :action="route('categories.store')" :submitLabel="__('Create')" :afterSubmitLabel="__('Creating...')" />
         </x-card>
     </x-page-section>
 </x-layouts.app>

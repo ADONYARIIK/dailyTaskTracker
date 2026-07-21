@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Category;
@@ -33,7 +35,7 @@ class TaskFactory extends Factory
 
     public function forRecurringTask(RecurringTask $recurringTask): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'recurring_task_id' => $recurringTask->id,
             'user_id' => $recurringTask->user_id,
             'category_id' => $recurringTask->category_id,
@@ -52,27 +54,27 @@ class TaskFactory extends Factory
                     'task_date' => $taskDate,
                     'completed_at' => fake()->dateTimeBetween($taskDate, 'now'),
                 ];
-            }
+            },
         );
     }
 
     public function withoutCategories(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'category_id' => null,
         ]);
     }
 
     public function today(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'task_date' => now()->startOfDay(),
         ]);
     }
 
     public function overdue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'task_date' => fake()->dateTimeBetween('-60 days', '-1 day'),
             'completed_at' => null,
         ]);

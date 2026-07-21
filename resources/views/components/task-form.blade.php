@@ -4,9 +4,11 @@
     'action',
     'method' => 'POST',
     'submitLabel' => null,
+    'afterSubmitLabel' => null,
 ])
 
-<form method="POST" action="{{ $action }}" {{ $attributes->merge(['class' => 'space-y-4 md:space-y-6']) }}>
+<form method="POST" action="{{ $action }}" {{ $attributes->merge(['class' => 'space-y-4 md:space-y-6']) }}
+    x-data="{ submitting: false }" @submit="submitting = true">
     @csrf
     @if ($method !== 'POST')
         @method($method)
@@ -42,7 +44,7 @@
 
         <div>
             <x-input.label for="task_date" :value="__('Due date')" />
-            <x-input.text-input id="task_date" type="date" name="task_date" :value="old('task_date', ($task['task_date'] ?? null)?->toDateString())" />
+            <x-input.text-input id="task_date" type="date" name="task_date" :value="old('task_date', $task['task_date']['datetime'] ?? null)" />
             <x-input.error :messages="$errors->get('task_date')" class="mt-2" />
         </div>
     </div>
@@ -53,8 +55,11 @@
             {{ __('Cancel') }}
         </a>
 
-        <x-input.primary-button :fullWidth="false">
-            {{ $submitLabel ?? ($task ? __('Update') : __('Create')) }}
+        <x-input.primary-button :fullWidth="false" ::disabled="submitting">
+            <span x-show="!submitting">{{ $submitLabel ?? ($task ? __('Update') : __('Create')) }}</span>
+            <span x-show="submitting" x-cloak>
+                {{ $afterSubmitLabel ?? ($task ? __('Updating...') : __('Creating...')) }}
+            </span>
         </x-input.primary-button>
     </div>
 </form>

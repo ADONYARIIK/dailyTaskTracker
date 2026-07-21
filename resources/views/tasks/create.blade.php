@@ -5,7 +5,7 @@
                 {{ __('Create task') }}
             </h1>
 
-            <x-task-form :categories="$categories" :action="route('tasks.store')" :submitLabel="__('Create')" />
+            <x-task-form :categories="$categories" :action="route('tasks.store')" :submitLabel="__('Create')" :afterSubmitLabel="__('Creating...')"/>
         </x-card>
     </x-page-section>
 </x-layouts.app>

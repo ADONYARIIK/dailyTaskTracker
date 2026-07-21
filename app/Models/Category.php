@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Observers\CategoryObserver;
 use Illuminate\Console\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,9 +23,10 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Collection<int, \App\Models\Task> $tasks
+ * @property-read Collection<int, Task> $tasks
  * @property-read int|null $tasks_count
- * @property-read \App\Models\User $user
+ * @property-read User $user
+ *
  * @method static \Database\Factories\CategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newQuery()
@@ -32,13 +37,15 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereUuid($value)
+ *
  * @mixin \Eloquent
  */
 #[Fillable(['name'])]
 #[Hidden(['id'])]
+#[ObservedBy(CategoryObserver::class)]
 class Category extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     public function getRouteKeyName()
     {

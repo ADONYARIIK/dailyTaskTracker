@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\RegisterUser;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Log In
-    public function showLoginForm()
+    public function showLoginForm(): View
     {
         return view('auth.login');
     }
@@ -27,41 +27,32 @@ class AuthController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->withInput($request->except('password'));
+        return back()
+            ->withErrors(['email' => 'The provided credentials do not match our records.'])
+            ->withInput($request->except('password'));
     }
 
-    // Register
-    public function showRegisterForm()
+    public function showRegisterForm(): View
     {
         return view('auth.register');
     }
 
-    public function register(RegisterRequest $request): RedirectResponse
+    public function register(RegisterRequest $request, RegisterUser $registerUser): RedirectResponse
     {
-        $validated = $request->validated();
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        event(new Registered($user));
+        $user = $registerUser->execute($request->validated());
 
         Auth::login($user, $request->boolean('remember'));
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
-    // Log Out
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->to('/');
     }
 }

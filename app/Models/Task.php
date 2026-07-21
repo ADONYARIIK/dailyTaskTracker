@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Console\Attributes\Hidden;
@@ -22,9 +24,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $completed_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\Category|null $category
- * @property-read \App\Models\RecurringTask|null $recurringTask
- * @property-read \App\Models\User $user
+ * @property-read Category|null $category
+ * @property-read RecurringTask|null $recurringTask
+ * @property-read User $user
+ *
  * @method static \Database\Factories\TaskFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task newQuery()
@@ -40,13 +43,14 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereUuid($value)
+ *
  * @mixin \Eloquent
  */
-#[Fillable(['category_id', 'title', 'user_id', 'description', 'recurring_task_id', 'task_date', 'completed_at'])]
+#[Fillable(['category_id', 'title', 'description', 'task_date', 'completed_at'])]
 #[Hidden(['id'])]
 class Task extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     /**
      * @return array<string, string>

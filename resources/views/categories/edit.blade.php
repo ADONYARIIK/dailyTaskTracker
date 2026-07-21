@@ -8,7 +8,7 @@
 
             <x-flash-message />
 
-            <x-category-form :category="$category" :action="route('categories.update', ['category' => $category['id']])" method="PUT" :submitLabel="__('Update')" />
+            <x-category-form :category="$category" :action="route('categories.update', ['category' => $category['id']])" method="PUT" :submitLabel="__('Update')" :afterSubmitLabel="__('Updating...')" />
         </x-card>
     </x-page-section>
 </x-layouts.app>

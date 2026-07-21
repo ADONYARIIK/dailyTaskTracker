@@ -6,7 +6,7 @@
                 {{ __('Create recurring task') }}
             </h1>
 
-            <x-recurring-task-form :categories="$categories" :action="route('recurring-tasks.store')" :submitLabel="__('Create')" />
+            <x-recurring-task-form :categories="$categories" :action="route('recurring-tasks.store')" :submitLabel="__('Create')" :afterSubmitLabel="__('Creating...')" />
         </x-card>
     </x-page-section>
 </x-layouts.app>

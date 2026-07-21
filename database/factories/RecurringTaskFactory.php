@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\TaskFrequency;
@@ -34,7 +36,7 @@ class RecurringTaskFactory extends Factory
 
     public function daily(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'frequency' => TaskFrequency::Daily->value,
             'frequency_config' => null,
         ]);
@@ -42,7 +44,7 @@ class RecurringTaskFactory extends Factory
 
     public function weekdays(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'frequency' => TaskFrequency::Weekdays->value,
             'frequency_config' => null,
         ]);
@@ -50,7 +52,7 @@ class RecurringTaskFactory extends Factory
 
     public function weekly(array $days = ['monday']): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'frequency' => TaskFrequency::Weekly->value,
             'frequency_config' => ['days' => $days],
         ]);
@@ -58,15 +60,15 @@ class RecurringTaskFactory extends Factory
 
     public function monthly(int $day = 1): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'frequency' => TaskFrequency::Monthly->value,
             'frequency_config' => ['day' => $day],
         ]);
     }
 
-    public function withEndDate(string|null $endDate = '+1 year'): static
+    public function withEndDate(?string $endDate = '+1 year'): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'end_date' => $endDate ? now()->modify($endDate) : null,
         ]);
     }

@@ -6,7 +6,8 @@
                 {{ __('Edit task') }}
             </h1>
 
-            <x-task-form :task="$task" :categories="$categories" :action="route('tasks.update', ['task' => $task['id']])" method="PUT" :submitLabel="__('Update')" />
+            <x-task-form :task="$task" :categories="$categories" :action="route('tasks.update', ['task' => $task['id']])" method="PUT" :submitLabel="__('Update')"
+                :afterSubmitLabel="__('Updating...')" />
         </x-card>
     </x-page-section>
 </x-layouts.app>

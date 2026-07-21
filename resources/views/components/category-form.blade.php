@@ -3,9 +3,11 @@
     'action',
     'method' => 'POST',
     'submitLabel' => null,
+    'afterSubmitLabel' => null,
 ])
 
-<form method="POST" action="{{ $action }}" {{ $attributes->merge(['class' => 'space-y-4 md:space-y-6']) }}>
+<form method="POST" action="{{ $action }}" {{ $attributes->merge(['class' => 'space-y-4 md:space-y-6']) }}
+    x-data="{ submitting: false }" @submit="submitting = true">
     @csrf
     @if ($method !== 'POST')
         @method($method)
@@ -25,8 +27,11 @@
         </div>
 
         <div>
-            <x-input.primary-button :fullWidth="false">
-                {{ $submitLabel ?? ($category ? __('Update') : __('Create')) }}
+            <x-input.primary-button :fullWidth="false" ::disabled="submitting">
+                <span x-show="!submitting">{{ $submitLabel ?? ($category ? __('Update') : __('Create')) }}</span>
+                <span x-show="submitting" x-cloak>
+                    {{ $afterSubmitLabel ?? ($category ? __('Updating...') : __('Creating...')) }}
+                </span>
             </x-input.primary-button>
         </div>
     </div>

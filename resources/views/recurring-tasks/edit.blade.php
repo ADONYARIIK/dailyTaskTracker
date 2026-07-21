@@ -6,9 +6,8 @@
                 {{ __('Edit recurring task') }}
             </h1>
 
-            <x-recurring-task-form :recurringTask="$recurringTask" :categories="$categories"
-                :action="route('recurring-tasks.update', ['recurring_task' => $recurringTask['id']])" method="PUT"
-                :submitLabel="__('Update')" />
+            <x-recurring-task-form :recurringTask="$recurringTask" :categories="$categories" :action="route('recurring-tasks.update', ['recurring_task' => $recurringTask['id']])" method="PUT" :submitLabel="__('Update')"
+                :afterSubmitLabel="__('Updating...')" />
         </x-card>
     </x-page-section>
 </x-layouts.app>

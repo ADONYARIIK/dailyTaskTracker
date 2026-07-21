@@ -33,19 +33,22 @@
                     </thead>
                     <tbody>
                         @forelse ($recurringTasks as $recurringTask)
-                            <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                            <tr data-recurring-task-item
+                                class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                                 <td class="px-6 py-4">
-                                    <p class="font-medium text-gray-900 dark:text-white">{{ $recurringTask['title'] }}</p>
+                                    <p class="font-medium text-gray-900 dark:text-white">{{ $recurringTask['title'] }}
+                                    </p>
                                     @if ($recurringTask['description'])
                                         <p class="mt-1 max-w-md text-sm">
                                             {{ Str::limit($recurringTask['description'], 50) }}</p>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4">{{ $recurringTask['category']['name'] ?? __('Uncategorized') }}</td>
+                                <td class="px-6 py-4">{{ $recurringTask['category']['name'] ?? __('Uncategorized') }}
+                                </td>
                                 <td class="px-6 py-4">{{ $recurringTask['frequency_label'] }}</td>
                                 <td class="px-6 py-4">
                                     @if ($recurringTask['frequency'] === 'weekly' && !empty($recurringTask['days']))
-                                        {{ collect($recurringTask['days'])->map(fn ($day) => ucfirst(substr($day, 0, 3)))->join(', ') }}
+                                        {{ collect($recurringTask['days'])->map(fn($day) => ucfirst(substr($day, 0, 3)))->join(', ') }}
                                     @elseif ($recurringTask['frequency'] === 'monthly' && $recurringTask['day_of_month'])
                                         {{ __('Day :day', ['day' => $recurringTask['day_of_month']]) }}
                                     @else
@@ -54,10 +57,13 @@
                                     @if ($recurringTask['start_date'] || $recurringTask['end_date'])
                                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                             @if ($recurringTask['start_date'])
-                                                {{ __('From') }}: {{ $recurringTask['start_date']->format('M d, Y') }}
+                                                {{ __('From') }}:
+                                                {{ $recurringTask['start_date']['display'] }}
                                             @endif
+                                            <br />
                                             @if ($recurringTask['end_date'])
-                                                {{ __('To') }}: {{ $recurringTask['end_date']->format('M d, Y') }}
+                                                {{ __('To') }}:
+                                                {{ $recurringTask['end_date']['display'] }}
                                             @endif
                                         </p>
                                     @endif
@@ -68,16 +74,11 @@
                                             class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">
                                             {{ __('Edit') }}
                                         </a>
-                                        <form method="POST"
-                                            action="{{ route('recurring-tasks.destroy', ['recurring_task' => $recurringTask['id']]) }}"
-                                            onsubmit="return confirm('{{ __('Are you sure you want to delete this recurring task?') }}')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="text-sm font-medium text-red-600 hover:underline dark:text-red-400">
-                                                {{ __('Delete') }}
-                                            </button>
-                                        </form>
+                                        <button type="button" data-recurring-task-delete
+                                            data-id="{{ $recurringTask['id'] }}"
+                                            class="cursor-pointer text-sm font-medium text-red-600 hover:underline dark:text-red-400">
+                                            {{ __('Delete') }}
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -97,4 +98,7 @@
             </div>
         </x-card>
     </x-page-section>
+    @push('scripts')
+        @vite('resources/js/pages/recurring-tasks-index.js')
+    @endpush
 </x-layouts.app>

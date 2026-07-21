@@ -115,12 +115,12 @@ DROP TABLE IF EXISTS `recurring_tasks`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `recurring_tasks` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `category_id` bigint unsigned DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `frequency` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `frequency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `frequency_config` json DEFAULT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE `recurring_tasks` (
   UNIQUE KEY `recurring_tasks_uuid_unique` (`uuid`),
   KEY `recurring_tasks_user_id_index` (`user_id`),
   KEY `recurring_tasks_category_id_index` (`category_id`),
-  CONSTRAINT `recurring_tasks_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+  CONSTRAINT `recurring_tasks_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
   CONSTRAINT `recurring_tasks_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -211,3 +211,4 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (8,'2026_07_13_1646
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (9,'2026_07_13_170335_change_tasks',4);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (10,'2026_07_13_172109_add_recurring_task_id_to_tasks_table',4);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (11,'2026_07_13_213150_change_task_date_to_date_type',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (12,'2026_07_17_181049_add_cascade_null_on_delete_to_tasks_and_recurring_tasks_tables',6);
